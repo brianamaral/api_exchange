@@ -80,5 +80,21 @@ class DataWriter():
         else:
             self._write_line(self._clean_dict(data))
 
+class DataIngestor(ABC):
+    def __init__(self,writer: DataWriter, bases: list[str], default_start_date: date,symbols:str = 'BTC,USD,EUR') -> None:
+        self.default_start_date = default_start_date
+        self.bases = bases
+        self.writer = writer
+        self.symbols = symbols
+    
+    @abstractmethod
+    def ingest(self) -> None:
+        pass
 
-        
+class TimeSeriesIngestor(DataIngestor):
+    def ingest(self) -> None:
+        for base in self.bases:
+            api = TimeSeriesApi(base_coin=base,places=5,symbols=self.symbols)
+            data = api.get_response(start_date = self.default_start_date,end_date = date.today())
+            self.writer.write(data = data)
+

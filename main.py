@@ -1,4 +1,5 @@
-from base_api import UserFetchIngestor, DataWriter
+from ingestors import UserFetchIngestor
+from writers import DataWriter
 import datetime
 import time
 from schedule import every, repeat, run_pending

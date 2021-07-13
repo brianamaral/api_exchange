@@ -1,7 +1,16 @@
-from base_api import HistoricalRateApi
+from base_api import UserFetchIngestor,DataWriter
 import datetime
+import time
+from schedule import every, repeat, run_pending
 
 if __name__ == "__main__":
-    file = open("file.csv", "a")
+    
+    ingestor = UserFetchIngestor(writer = DataWriter)
 
-    file.write("linha1 \n")
+    @repeat(every(1).seconds)
+    def job():
+        ingestor.ingest()
+
+    while True:
+        run_pending()
+        time.sleep(0.5)

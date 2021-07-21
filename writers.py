@@ -1,9 +1,10 @@
 import os 
 import datetime
 import json
+import boto3
 
 class DataWriter:
-    def __init__(self, api: str) -> None:
+    def __init__(self, api: str,**kwargs) -> None:
         self.api = api
         self.filename = (
             f'{api}/{datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")}.json'
@@ -31,3 +32,28 @@ class DataWriter:
     def write(self, data: dict) -> None:
         for line in self._subdicts_into_dict(self._clean_dict(data)):
             self._write_line(line)
+
+class S3Writer(DataWriter):
+    def __init__(self, api: str) -> None:
+        super().__init__(api)
+
+        self.s3 = boto3.resource('s3',
+                                aws_access_key_id = '',
+                                aws_secret_access_key = '')
+        
+    
+    def _read_file(self):
+        with open(file=self.filename,mode='rb') as file:
+            return file.read()
+    
+    def write(self, data: dict) -> None:
+        super().write(data)
+        self.write_to_s3('miyamoto-datalake-raw')
+    
+    def write_to_s3(self,bucket: str):
+        data = self._read_file()
+        self.s3.Bucket(bucket).put_object(Key=self.filename,Body='data')
+
+
+
+        

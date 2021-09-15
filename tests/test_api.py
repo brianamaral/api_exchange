@@ -12,6 +12,7 @@ import pytest
 def test_get_endpoint(n_results,expected):
     user_fetch_api = UserFetchApi()
 
+
     actual = user_fetch_api._get_endpoint(n_results = n_results)
 
     assert actual == expected
